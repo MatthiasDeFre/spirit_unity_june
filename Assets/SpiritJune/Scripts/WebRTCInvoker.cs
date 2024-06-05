@@ -37,4 +37,6 @@ public unsafe class WebRTCInvoker
     public static extern int get_control_size();
     [DllImport("WebRTCConnector")]
     public static extern void retrieve_control(IntPtr buffer);
+    [DllImport("WebRTCConnector")]
+    public static extern void wait_for_peer();
 }

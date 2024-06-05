@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465791, g: 0.4964133, b: 0.57481784, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -303,13 +303,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LoggingLevel: 0
   ClientID: 0
+  NDescriptions: 1
   PeerUDPPort: 8000
-  PeerSFUAddress: 10.10.130.215
+  PeerSFUAddress: 10.10.130.215:8094
   StartLocations:
   - {fileID: 428462893}
   - {fileID: 2079401778}
-  - {fileID: 1502180560}
-  - {fileID: 1595278737}
   PCSelfPrefab: {fileID: 5525593982517720611, guid: ac694f47884081949a584b48edabb7eb, type: 3}
   PCReceiverPrefab: {fileID: 3474630412075943439, guid: cdb69d015e5e92e4fab9fef23cc30ee2, type: 3}
 --- !u!4 &1343483266

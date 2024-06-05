@@ -29,9 +29,11 @@ public class PCReceiver : MonoBehaviour
         for (int i = 0; i < NDescriptions; i++)
         {
             queues.Add(new ConcurrentQueue<DecodedPointCloudData>());
+            int descriptionID = i; // Copy as thread starts later but still uses reference to i
             workerThreads.Add(new System.Threading.Thread(() =>
             {
-                pollDescription((uint)i);
+                Debug.Log($"CREAETING {descriptionID}");
+                pollDescription((uint)descriptionID);
             }));
             workerThreads[i].Start();
         }
@@ -65,12 +67,26 @@ public class PCReceiver : MonoBehaviour
             }
         }
     }
-
+    void OnDestroy()
+    {
+        for(int i = 0;i < NDescriptions;i++)
+        {
+            workerThreads[i].Join();
+        }    
+    }
     private void pollDescription(uint descriptionID)
     {
-        while(keep_working)
+        WebRTCInvoker.wait_for_peer();
+        while (keep_working)
         {
             int descriptionSize = WebRTCInvoker.get_tile_size(ClientID, descriptionID);
+            keep_working = false;
+            continue;
+            if (descriptionSize == 0)
+            {
+                keep_working = false; 
+                continue;
+            }
             byte[] messageBuffer = new byte[descriptionSize];
             IntPtr decoderPtr = IntPtr.Zero;
             unsafe

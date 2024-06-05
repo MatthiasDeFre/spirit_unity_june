@@ -35,6 +35,7 @@ public class PCSelf : MonoBehaviour
 
     void pollFrames()
     {
+        WebRTCInvoker.wait_for_peer();
         while (keep_working)
         {          
             IntPtr frame = Realsense2Invoker.poll_next_point_cloud();
@@ -48,6 +49,11 @@ public class PCSelf : MonoBehaviour
                 //      * Add frame header
                 int nSend = WebRTCInvoker.send_tile(rawDataPtr, encodedSize, 0);
                 DracoInvoker.free_encoder(encoderPtr);
+                if(nSend == -1)
+                {
+                    keep_working = false;
+                    Debug.Log("Stop capturing");
+                }
             }
             else
             {
