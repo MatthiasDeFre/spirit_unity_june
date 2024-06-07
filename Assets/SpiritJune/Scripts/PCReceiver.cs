@@ -35,6 +35,7 @@ public class PCReceiver : MonoBehaviour
     {
         meshFilter = PCRenderer.GetComponent<MeshFilter>();
         queue = new();
+        inProgessFrames = new();
         for (int i = 0; i < NDescriptions; i++)
         {
             int descriptionID = i; // Copy as thread starts later but still uses reference to i
