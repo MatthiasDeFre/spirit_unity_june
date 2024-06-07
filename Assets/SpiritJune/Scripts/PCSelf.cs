@@ -2,6 +2,7 @@ using AOT;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEditor.Search;
 using UnityEngine;
@@ -11,12 +12,27 @@ public class PCSelf : MonoBehaviour
     System.Threading.Thread workerThread;
     static bool keep_working = true;
     [MonoPInvokeCallback(typeof(DracoInvoker.descriptionDoneCallback))]
-    static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
+    static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 totalPointsInCloud, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
     {
         if (keep_working)
         {
+            byte[] frameHeader = new byte[8];
+            var frameNrField = BitConverter.GetBytes(frameNr);
+            frameNrField.CopyTo(frameHeader, 0);
+            var nPointsFrameField = BitConverter.GetBytes(totalPointsInCloud);
+            nPointsFrameField.CopyTo(frameHeader, 4);
+            byte[] messageBuffer = new byte[frameHeader.Length + dscSize];
+            System.Buffer.BlockCopy(frameHeader, 0, messageBuffer, 0, frameHeader.Length);
+            Marshal.Copy(rawDataPtr, messageBuffer, frameHeader.Length, (int)dscSize);
+            int nSend = 0;
+            unsafe
+            {
+                fixed (byte* bufferPointer = messageBuffer)
+                {
+                    nSend = WebRTCInvoker.send_tile(bufferPointer, (uint)messageBuffer.Length, dscNr);
+                }
+            }
            
-            int nSend = WebRTCInvoker.send_tile(rawDataPtr, dscSize, dscNr);
             if (nSend == -1)
             {
                keep_working = false;

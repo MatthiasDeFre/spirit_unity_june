@@ -98,14 +98,16 @@ public class PCReceiver : MonoBehaviour
             Debug.Log("Got a tile");
             byte[] messageBuffer = new byte[descriptionSize];
             IntPtr decoderPtr = IntPtr.Zero;
-            int descriptionFrameNr = WebRTCInvoker.get_tile_frame_number(ClientID, descriptionID);
+            //int descriptionFrameNr = WebRTCInvoker.get_tile_frame_number(ClientID, descriptionID);
             unsafe
             {
                 fixed (byte* ptr = messageBuffer)
                 {
                     WebRTCInvoker.retrieve_tile(ptr, (uint)descriptionSize, ClientID, descriptionID);
+                    int descriptionFrameNr = BitConverter.ToInt32(messageBuffer, 0);
+                    
                     Debug.Log($"Start decoding");
-                    decoderPtr = DracoInvoker.decode_pc(ptr, (uint)descriptionSize);
+                    decoderPtr = DracoInvoker.decode_pc(ptr + 8, (uint)descriptionSize);
                     Debug.Log($"Decoding done");           
                     if (decoderPtr == IntPtr.Zero)
                     {
@@ -113,11 +115,11 @@ public class PCReceiver : MonoBehaviour
                         continue;
                     }
                     mut.WaitOne();
-
                     DecodedPointCloudData pcData;
                     if (!inProgessFrames.TryGetValue(descriptionFrameNr, out pcData))
                     {
-                        pcData = new DecodedPointCloudData(1000, NDescriptions);
+                        int nTotalPointsInFrame = BitConverter.ToInt32(messageBuffer, 4);
+                        pcData = new DecodedPointCloudData(nTotalPointsInFrame, NDescriptions);
                         inProgessFrames.Add(descriptionFrameNr, pcData);
                     }
                     UInt32 nDecodedPoints = DracoInvoker.get_n_points(decoderPtr);

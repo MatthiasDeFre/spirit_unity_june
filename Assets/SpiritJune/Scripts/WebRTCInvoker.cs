@@ -17,7 +17,7 @@ public unsafe class WebRTCInvoker
     [DllImport("WebRTCConnector")]
     public static extern void clean_up();
     [DllImport("WebRTCConnector")]
-    public static extern int send_tile(IntPtr data, UInt32 size, UInt32 tile_number);
+    public static extern int send_tile(byte* data, UInt32 size, UInt32 tile_number);
     [DllImport("WebRTCConnector")]
     public static extern int get_tile_size(UInt32 client_id, UInt32 tile_number);
     [DllImport("WebRTCConnector")]

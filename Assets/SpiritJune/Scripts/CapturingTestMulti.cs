@@ -54,7 +54,7 @@ public class CapturingTestMulti : MonoBehaviour
     }
 
     [MonoPInvokeCallback(typeof(DracoInvoker.descriptionDoneCallback))]
-    static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
+    static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 totalPointsInCloud, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
     {
         Debug.Log($"{dscSize} {frameNr} {dscNr}");
         mut.WaitOne();
