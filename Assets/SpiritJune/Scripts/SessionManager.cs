@@ -12,7 +12,7 @@ public class SessionManager : MonoBehaviour
 {
     public int LoggingLevel = 0;
     public int ClientID = 0;
-    public int NDescriptions = 1;
+    public int NDescriptions = 3;
     public int PeerUDPPort = 8000;
     public string PeerSFUAddress = "10.10.130.215:8094";
 
@@ -38,7 +38,7 @@ public class SessionManager : MonoBehaviour
         
         peerProcess = new Process();
         peerProcess.StartInfo.FileName = Application.dataPath + "/peer/webRTC-peer-win.exe";
-        peerProcess.StartInfo.Arguments = $"-p :{PeerUDPPort} -i -o -sfu {PeerSFUAddress} -c {ClientID}";
+        peerProcess.StartInfo.Arguments = $"-p :{PeerUDPPort} -i -o -sfu {PeerSFUAddress} -c {ClientID} -t {NDescriptions}";
         /*peerProcess.StartInfo.CreateNoWindow = !peerInWindow;
         if (peerInWindow && peerWindowDontClose)
         {
@@ -68,7 +68,7 @@ public class SessionManager : MonoBehaviour
         
     }
 
-    void OnDestroy()
+    void OnApplicationQuit()
     {
         peerProcess?.Kill();
         WebRTCInvoker.clean_up();

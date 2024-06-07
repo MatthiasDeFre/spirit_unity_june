@@ -13,10 +13,10 @@ public class PCSelf : MonoBehaviour
     [MonoPInvokeCallback(typeof(DracoInvoker.descriptionDoneCallback))]
     static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
     {
-        if(!keep_working)
+        if (keep_working)
         {
+           
             int nSend = WebRTCInvoker.send_tile(rawDataPtr, dscSize, dscNr);
-
             if (nSend == -1)
             {
                keep_working = false;
@@ -54,7 +54,7 @@ public class PCSelf : MonoBehaviour
     {
         
     }
-    public void OnDestroy()
+    void OnDestroy()
     {
         keep_working = false;
         workerThread.Join();

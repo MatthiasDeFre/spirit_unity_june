@@ -303,7 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LoggingLevel: 0
   ClientID: 0
-  NDescriptions: 1
+  NDescriptions: 3
   PeerUDPPort: 8000
   PeerSFUAddress: 10.10.130.215:8094
   StartLocations:

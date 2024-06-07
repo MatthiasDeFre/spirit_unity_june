@@ -77,7 +77,7 @@ public class PCReceiver : MonoBehaviour
     {
         for(int i = 0;i < NDescriptions;i++)
         {
-            workerThreads[i].Join();
+       //     workerThreads[i].Join();
         }    
     }
     private void pollDescription(uint descriptionID)
