@@ -82,11 +82,11 @@ public class SessionManager : MonoBehaviour
         {
             if(ClientID == i) // This user
             {
-                pcSelf = Instantiate(PCSelfPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+                pcSelf = Instantiate(PCSelfPrefab, StartLocations[i].transform.position, StartLocations[i].transform.rotation);
                 pcSelf.transform.parent = StartLocations[i].transform;
             } else // Other users
             {
-                PCReceiver pcReceiver = Instantiate(PCReceiverPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+                PCReceiver pcReceiver = Instantiate(PCReceiverPrefab, StartLocations[i].transform.position, StartLocations[i].transform.rotation);
                 pcReceiver.transform.parent = StartLocations[i].transform;
                 pcReceiver.ClientID = (uint)i;
                 pcReceiver.NDescriptions = NDescriptions;
