@@ -21,6 +21,8 @@ public unsafe class WebRTCInvoker
     [DllImport("WebRTCConnector")]
     public static extern int get_tile_size(UInt32 client_id, UInt32 tile_number);
     [DllImport("WebRTCConnector")]
+    public static extern int get_tile_frame_number(UInt32 client_id, UInt32 tile_number);
+    [DllImport("WebRTCConnector")]
     public static extern void retrieve_tile(byte* buffer, UInt32 size, UInt32 client_id, UInt32 tile_number);
 
     // Audio frame functions

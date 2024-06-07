@@ -1,3 +1,4 @@
+using AOT;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,13 +9,34 @@ using UnityEngine;
 public class PCSelf : MonoBehaviour
 {
     System.Threading.Thread workerThread;
-    bool keep_working = true;
+    static bool keep_working = true;
+    [MonoPInvokeCallback(typeof(DracoInvoker.descriptionDoneCallback))]
+    static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
+    {
+        if(!keep_working)
+        {
+            int nSend = WebRTCInvoker.send_tile(rawDataPtr, dscSize, dscNr);
 
-    
+            if (nSend == -1)
+            {
+               keep_working = false;
+               Debug.Log("Stop capturing");
+            }
+        }
+        DracoInvoker.free_description(dsc);
 
+    }
+    [MonoPInvokeCallback(typeof(DracoInvoker.freePCCallback))]
+    static void OnFreePCCallback(IntPtr pc)
+    {
+        Realsense2Invoker.free_point_cloud(pc);
+    }
     // Start is called before the first frame update
     void Start()
     {
+        DracoInvoker.register_description_done_callback(OnDescriptionDoneCallback);
+        DracoInvoker.register_free_pc_callback(OnFreePCCallback);
+        DracoInvoker.initialize();
         int initCode = Realsense2Invoker.initialize(848, 480, 30, false);
         if (initCode == 0)
         {
@@ -32,35 +54,35 @@ public class PCSelf : MonoBehaviour
     {
         
     }
-
+    public void OnDestroy()
+    {
+        keep_working = false;
+        workerThread.Join();
+        DracoInvoker.clean_up();
+    }
     void pollFrames()
     {
+        keep_working = true;
         WebRTCInvoker.wait_for_peer();
-        while (keep_working)
-        {          
+       
+
+         while(keep_working)
+        {
+            Debug.Log($"Poll next");
             IntPtr frame = Realsense2Invoker.poll_next_point_cloud();
-            if (frame != IntPtr.Zero)
+            Debug.Log($"Poll done");
+            if ( frame != IntPtr.Zero )
             {
-                IntPtr encoderPtr = DracoInvoker.encode_pc(frame);
-                Realsense2Invoker.free_point_cloud(frame);
-                IntPtr rawDataPtr = DracoInvoker.get_raw_data(encoderPtr);
-                UInt32 encodedSize = DracoInvoker.get_encoded_size(encoderPtr);
-                // TODO 
-                //      * Add frame header
-                int nSend = WebRTCInvoker.send_tile(rawDataPtr, encodedSize, 0);
-                DracoInvoker.free_encoder(encoderPtr);
-                if(nSend == -1)
-                {
-                    keep_working = false;
-                    Debug.Log("Stop capturing");
-                }
-            }
-            else
+                Debug.Log($"Get size");
+                uint nPoints = Realsense2Invoker.get_point_cloud_size(frame);
+                Debug.Log($"Number of points: {nPoints}");
+                int returnCode = DracoInvoker.encode_pc(frame);
+            } else
             {
-                Debug.Log("No frame");
+                Debug.Log("No frame"); 
                 keep_working = false;
             }
-
+            
         }
         Realsense2Invoker.clean_up();
     }
