@@ -38,6 +38,10 @@ public class PCReceiver : MonoBehaviour
         queue = new();
         inProgessFrames = new();
         activeDescriptions = new(NDescriptions);
+        for(int i = 0; i < NDescriptions; i++)
+        {
+            activeDescriptions.Add(false);
+        }
         for (int i = 0; i < NDescriptions; i++)
         {
             int descriptionID = i; // Copy as thread starts later but still uses reference to i
