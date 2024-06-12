@@ -98,8 +98,10 @@ public class PCSelf : MonoBehaviour
                     output += row[j].ToString("0.00000") + ";";
                 }
             }
+
             Vector3 pos = transform.position;
-            output += $"{pos.x};{pos.y+1};{pos.z}";
+            Debug.Log(pos);
+            output += $"{pos.x};{pos.y+1};{pos.z};";
             byte[] outputBytes = Encoding.ASCII.GetBytes(output);
             unsafe
             {
