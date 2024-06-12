@@ -10,6 +10,7 @@ public class DecodedPointCloudData
     public int NPoints;
     public int MaxDescriptions;
     public int CurrentNDescriptions;
+    public int Quality = 0;
     public List<Vector3> Points;
     public List<Color32> Colors;
     public List<bool> CompletionStatus;

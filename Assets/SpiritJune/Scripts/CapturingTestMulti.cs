@@ -83,16 +83,20 @@ public class CapturingTestMulti : MonoBehaviour
             float* pointsUnsafePtr = (float*)pointsPtr;
             byte* colorsUnsafePtr = (byte*)colorPtr;
             int zeros = 0;
-            for (int i = 0; i < nDecodedPoints; i++)
+            if(dscNr == 2)
             {
-                //    points[i] = new Vector3(0, 0, 0);
-                if(pointsUnsafePtr[(i * 3)] == 0 && pointsUnsafePtr[(i * 3)+1] == 0 && pointsUnsafePtr[(i * 3)+2] == 0)
+                for (int i = 0; i < nDecodedPoints; i++)
                 {
-                    zeros++;
+                    //    points[i] = new Vector3(0, 0, 0);
+                    if (pointsUnsafePtr[(i * 3)] == 0 && pointsUnsafePtr[(i * 3) + 1] == 0 && pointsUnsafePtr[(i * 3) + 2] == 0)
+                    {
+                        zeros++;
+                    }
+                    pcData.Points.Add(new Vector3(pointsUnsafePtr[(i * 3)] * -1, pointsUnsafePtr[(i * 3) + 1] * -1, pointsUnsafePtr[(i * 3) + 2] * -1));
+                    pcData.Colors.Add(new Color32(colorsUnsafePtr[(i * 3)], colorsUnsafePtr[(i * 3) + 1], colorsUnsafePtr[(i * 3) + 2], 255));
                 }
-                pcData.Points.Add(new Vector3(pointsUnsafePtr[(i * 3)]*-1, pointsUnsafePtr[(i * 3) + 1]*-1, pointsUnsafePtr[(i * 3) + 2]*-1));
-                pcData.Colors.Add(new Color32(colorsUnsafePtr[(i * 3)], colorsUnsafePtr[(i * 3) + 1], colorsUnsafePtr[(i * 3) + 2], 255));
             }
+            
             Debug.Log($"ZEROES {dscNr} {zeros}");
             DracoInvoker.free_decoder(decoderPtr);
             Debug.Log($"Decoders freed");
@@ -129,7 +133,7 @@ public class CapturingTestMulti : MonoBehaviour
         Realsense2Invoker.set_logging("", debug);
         DracoInvoker.RegisterDebugCallback(OnDebugCallbackDraco);
         DracoInvoker.set_logging("", debug);
-        int initCode = Realsense2Invoker.initialize(848, 480, 30, 0.1f, 1.0f, true);
+        int initCode = Realsense2Invoker.initialize(848, 480, 30, 0.1f, 1.0f, false);
         DracoInvoker.register_description_done_callback(OnDescriptionDoneCallback);
         DracoInvoker.register_free_pc_callback(OnFreePCCallback);
         DracoInvoker.initialize();
@@ -166,8 +170,10 @@ public class CapturingTestMulti : MonoBehaviour
                     MeshTopology.Points, 0
                 );
                 Debug.Log($"NVertex: {currentMesh.vertexCount}");
+                Debug.Log($"Bounds: {currentMesh.bounds}");
                 currentMesh.UploadMeshData(true);
                 meshFilter.mesh = currentMesh;
+
             }
         }
     }

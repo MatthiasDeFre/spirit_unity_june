@@ -27,14 +27,18 @@ public class PCReceiver : MonoBehaviour
     private bool keep_working = true;
 
     // ####################### Unity GameObjects #########################
-    public GameObject PCRenderer;
+    public List<GameObject> PCRenderers;
     Mesh currentMesh;
-    private MeshFilter meshFilter;
+    private List<MeshFilter> meshFilters;
 
     // Start is called before the first frame update
     void Start()
     {
-        meshFilter = PCRenderer.GetComponent<MeshFilter>();
+        meshFilters = new(PCRenderers.Count);
+        foreach(var p in PCRenderers)
+        {
+            meshFilters.Add(p.GetComponent<MeshFilter>());
+        }
         queue = new();
         inProgessFrames = new();
         activeDescriptions = new(NDescriptions);
@@ -75,7 +79,20 @@ public class PCReceiver : MonoBehaviour
                     MeshTopology.Points, 0
                 );
                 currentMesh.UploadMeshData(true);
-                meshFilter.mesh = currentMesh;
+                int rendererIndex = qualityToRenderIndex(dec.Quality);
+                for(int i = 0; i < PCRenderers.Count; i++)
+                {
+                    if(i == rendererIndex)
+                    {
+                        PCRenderers[i].SetActive(true);
+                        meshFilters[i].mesh = currentMesh;
+                    } else
+                    {
+                        PCRenderers[i].SetActive(false);
+                    }
+                   
+                }
+                
             }
         }
        
@@ -162,6 +179,7 @@ public class PCReceiver : MonoBehaviour
                     Debug.Log($"Decoders freed");
                     pcData.CompletionStatus[(int)descriptionID] = true;
                     pcData.CurrentNDescriptions++;
+                    pcData.Quality += descToQual(descriptionID);
                     if (pcData.IsCompleted)
                     {
                         //Debug.Log($"Frame {descriptionFrameNr} completed, last compl= {lastCompletedFrameNr}");
@@ -212,5 +230,26 @@ public class PCReceiver : MonoBehaviour
             }
         }
         mut.ReleaseMutex();
+    }
+    private int descToQual(uint dscNr)
+    {
+        switch(dscNr)
+        {
+            case 0:
+                return 60;
+            case 1:
+                return 25;
+            case 2:
+                return 15;
+        }
+        return 0;
+    }
+    private int qualityToRenderIndex(int quality)
+    {
+        switch(quality)
+        {
+
+        }
+        return -1;
     }
 }
