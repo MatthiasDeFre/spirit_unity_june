@@ -56,13 +56,19 @@ public class CapturingTestMulti : MonoBehaviour
     [MonoPInvokeCallback(typeof(DracoInvoker.descriptionDoneCallback))]
     static void OnDescriptionDoneCallback(IntPtr dsc, IntPtr rawDataPtr, UInt32 totalPointsInCloud, UInt32 dscSize, UInt32 frameNr, UInt32 dscNr)
     {
-        Debug.Log($"{dscSize} {frameNr} {dscNr}");
+        
+        if(frameNr % 100 == 0)
+        {
+            Debug.Log($"{dscSize} {frameNr} {dscNr}");
+        }
+        
+   
         mut.WaitOne();
        
         DecodedPointCloudData pcData;
         if (!inProgessFrames.TryGetValue(frameNr, out pcData))
-        {   
-            pcData = new DecodedPointCloudData(1000,3);
+        {
+            pcData = new DecodedPointCloudData((int)frameNr, 125000, 3, new List<bool> { true, true, true })  ;
             inProgessFrames.Add(frameNr, pcData);
         }
         unsafe
@@ -71,18 +77,23 @@ public class CapturingTestMulti : MonoBehaviour
             IntPtr decoderPtr = DracoInvoker.decode_pc((byte*)rawDataPtr, dscSize);
             Debug.Log($"Decoding done");
             UInt32 nDecodedPoints = DracoInvoker.get_n_points(decoderPtr);
-            Debug.Log($"Number of points after decoding: {nDecodedPoints}");
+            Debug.Log($"Number of points after decoding {dscNr}: {nDecodedPoints}");
             IntPtr pointsPtr = DracoInvoker.get_point_array(decoderPtr);
             IntPtr colorPtr = DracoInvoker.get_color_array(decoderPtr);
             float* pointsUnsafePtr = (float*)pointsPtr;
             byte* colorsUnsafePtr = (byte*)colorPtr;
-
+            int zeros = 0;
             for (int i = 0; i < nDecodedPoints; i++)
             {
                 //    points[i] = new Vector3(0, 0, 0);
-                pcData.Points.Add(new Vector3(pointsUnsafePtr[(i * 3)], pointsUnsafePtr[(i * 3) + 1], pointsUnsafePtr[(i * 3) + 2]));
+                if(pointsUnsafePtr[(i * 3)] == 0 && pointsUnsafePtr[(i * 3)+1] == 0 && pointsUnsafePtr[(i * 3)+2] == 0)
+                {
+                    zeros++;
+                }
+                pcData.Points.Add(new Vector3(pointsUnsafePtr[(i * 3)]*-1, pointsUnsafePtr[(i * 3) + 1]*-1, pointsUnsafePtr[(i * 3) + 2]*-1));
                 pcData.Colors.Add(new Color32(colorsUnsafePtr[(i * 3)], colorsUnsafePtr[(i * 3) + 1], colorsUnsafePtr[(i * 3) + 2], 255));
             }
+            Debug.Log($"ZEROES {dscNr} {zeros}");
             DracoInvoker.free_decoder(decoderPtr);
             Debug.Log($"Decoders freed");
         }
@@ -99,7 +110,7 @@ public class CapturingTestMulti : MonoBehaviour
     static void OnFreePCCallback(IntPtr pc)
     {
         Debug.Log("Free PC");
-        //Realsense2Invoker.free_point_cloud(pc);
+        Realsense2Invoker.free_point_cloud(pc);
     }
     public void OnEnable()
     {
@@ -110,6 +121,7 @@ public class CapturingTestMulti : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 120;
         queue = new ConcurrentQueue<DecodedPointCloudData>();
         inProgessFrames = new();
         meshFilter = GetComponent<MeshFilter>();
@@ -117,7 +129,7 @@ public class CapturingTestMulti : MonoBehaviour
         Realsense2Invoker.set_logging("", debug);
         DracoInvoker.RegisterDebugCallback(OnDebugCallbackDraco);
         DracoInvoker.set_logging("", debug);
-        int initCode = Realsense2Invoker.initialize(848, 480, 30, false);
+        int initCode = Realsense2Invoker.initialize(848, 480, 30, 0.1f, 1.0f, true);
         DracoInvoker.register_description_done_callback(OnDescriptionDoneCallback);
         DracoInvoker.register_free_pc_callback(OnFreePCCallback);
         DracoInvoker.initialize();
@@ -153,6 +165,7 @@ public class CapturingTestMulti : MonoBehaviour
                     Enumerable.Range(0, currentMesh.vertexCount).ToArray(),
                     MeshTopology.Points, 0
                 );
+                Debug.Log($"NVertex: {currentMesh.vertexCount}");
                 currentMesh.UploadMeshData(true);
                 meshFilter.mesh = currentMesh;
             }

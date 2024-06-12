@@ -46,7 +46,7 @@ public class SessionManager : MonoBehaviour
             peerProcess.StartInfo.FileName = "CMD.EXE";
         }*/
 
-        
+        PCHelperWrapper.Init();
         // Init WebRTC
         
 
@@ -91,6 +91,7 @@ public class SessionManager : MonoBehaviour
                 pcReceiver.ClientID = (uint)i;
                 pcReceiver.NDescriptions = NDescriptions;
                 pcReceivers.Add(pcReceiver);
+                PCHelperWrapper.Receivers.Add(pcReceiver.ClientID,  pcReceiver);
             }
         }
     }

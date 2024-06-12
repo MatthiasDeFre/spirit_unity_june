@@ -3,12 +3,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
-using UnityEditor.Search;
+
 using UnityEngine;
 
 public class PCSelf : MonoBehaviour
 {
+    public Camera cam;
+    public float CameraUpdateTimer = 0.300f;
+    private float currentCameraUpdateTimer = 0;
+
     System.Threading.Thread workerThread;
     static bool keep_working = true;
     [MonoPInvokeCallback(typeof(DracoInvoker.descriptionDoneCallback))]
@@ -25,6 +30,7 @@ public class PCSelf : MonoBehaviour
             System.Buffer.BlockCopy(frameHeader, 0, messageBuffer, 0, frameHeader.Length);
             Marshal.Copy(rawDataPtr, messageBuffer, frameHeader.Length, (int)dscSize);
             int nSend = 0;
+            Debug.Log($"{dscNr} {dscSize}");
             unsafe
             {
                 fixed (byte* bufferPointer = messageBuffer)
@@ -53,7 +59,7 @@ public class PCSelf : MonoBehaviour
         DracoInvoker.register_description_done_callback(OnDescriptionDoneCallback);
         DracoInvoker.register_free_pc_callback(OnFreePCCallback);
         DracoInvoker.initialize();
-        int initCode = Realsense2Invoker.initialize(848, 480, 30, false);
+        int initCode = Realsense2Invoker.initialize(848, 480, 30, 0.0f, 1.0f, false);
         if (initCode == 0)
         {
             workerThread = new System.Threading.Thread(pollFrames);
@@ -68,7 +74,40 @@ public class PCSelf : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        currentCameraUpdateTimer += Time.deltaTime;
+        if(currentCameraUpdateTimer > CameraUpdateTimer)
+        {
+            Matrix4x4 worldToCameraMatrix = cam.worldToCameraMatrix;
+            Matrix4x4 projectionMatrix = cam.projectionMatrix;
+            string output = "";
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4 row = worldToCameraMatrix.GetRow(i);
+                for (int j = 0; j < 4; j++)
+                {
+                    output += row[j].ToString("0.00000") + ";";
+                }
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                Vector4 row = projectionMatrix.GetRow(i);
+                for (int j = 0; j < 4; j++)
+                {
+                    output += row[j].ToString("0.00000") + ";";
+                }
+            }
+            Vector3 pos = cam.transform.position;
+            output += $"{pos.x};{pos.y};{pos.z}";
+            byte[] outputBytes = Encoding.ASCII.GetBytes(output);
+            unsafe
+            {
+                fixed (byte* bufferPointer = outputBytes)
+                {
+                    WebRTCInvoker.send_control_packet(bufferPointer, (uint)outputBytes.Length);
+                }
+            }
+            currentCameraUpdateTimer -= CameraUpdateTimer;
+        }
     }
     void OnDestroy()
     {

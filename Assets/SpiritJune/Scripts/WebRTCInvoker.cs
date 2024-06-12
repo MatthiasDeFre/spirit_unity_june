@@ -41,4 +41,12 @@ public unsafe class WebRTCInvoker
     public static extern void retrieve_control(IntPtr buffer);
     [DllImport("WebRTCConnector")]
     public static extern void wait_for_peer();
+
+    // Control packet functions
+    [DllImport("WebRTCConnector")]
+    public static extern int send_control_packet(byte* data, UInt32 size);
+
+    public delegate void trackChangeCb(UInt32 clientID, UInt32 lastFrameNr, UInt32 tileNr, bool isAdded);
+    [DllImport("WebRTCConnector", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void register_track_change_callback(trackChangeCb cb);
 }
