@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -82,8 +83,10 @@ public class SessionManager : MonoBehaviour
         {
             if(ClientID == i) // This user
             {
+                StartLocations[i].transform.position = new Vector3(StartLocations[i].transform.position.x, StartLocations[i].transform.position.y - 1, StartLocations[i].transform.position.z);
                 pcSelf = Instantiate(PCSelfPrefab, StartLocations[i].transform.position, StartLocations[i].transform.rotation);
                 pcSelf.transform.parent = StartLocations[i].transform;
+                
             } else // Other users
             {
                 PCReceiver pcReceiver = Instantiate(PCReceiverPrefab, StartLocations[i].transform.position, StartLocations[i].transform.rotation);

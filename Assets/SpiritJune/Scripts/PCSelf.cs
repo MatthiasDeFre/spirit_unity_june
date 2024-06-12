@@ -96,7 +96,7 @@ public class PCSelf : MonoBehaviour
                     output += row[j].ToString("0.00000") + ";";
                 }
             }
-            Vector3 pos = cam.transform.position;
+            Vector3 pos = transform.position;
             output += $"{pos.x};{pos.y};{pos.z}";
             byte[] outputBytes = Encoding.ASCII.GetBytes(output);
             unsafe
