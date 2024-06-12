@@ -164,8 +164,9 @@ public class PCReceiver : MonoBehaviour
                     pcData.CurrentNDescriptions++;
                     if (pcData.IsCompleted)
                     {
+                        //Debug.Log($"Frame {descriptionFrameNr} completed, last compl= {lastCompletedFrameNr}");
                         inProgessFrames.Remove(descriptionFrameNr);
-                        if (descriptionFrameNr <= lastCompletedFrameNr)
+                        if (descriptionFrameNr >= lastCompletedFrameNr)
                         {
                             lastCompletedFrameNr = pcData.FrameNr;
                             queue.Enqueue(pcData);
