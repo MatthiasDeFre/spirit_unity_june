@@ -7,8 +7,8 @@ public class ManualFOVCheck : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(Encoding.ASCII.GetBytes(ConvertToStringM(camera)).Length);
-     //   Debug.Log(WorldToViewportPointManual(go.transform.position, camera));
+        Debug.Log(ConvertToStringM(camera));
+        Debug.Log(WorldToViewportPointManual(go.transform.position, camera));
     }
     string ConvertToStringM(Camera cam)
     {
@@ -31,6 +31,8 @@ public class ManualFOVCheck : MonoBehaviour
                 output += row[j].ToString("0.00000") + ";";
             }
         }
+        Vector3 pos = transform.position;
+        output += $"{pos.x};{pos.y};{pos.z}";
         return output;
     }
     bool IsObjectInFOV(Vector3 objectPosition, Camera cam)
@@ -71,19 +73,18 @@ public class ManualFOVCheck : MonoBehaviour
     {
         // Step 1: Get the camera's world-to-camera matrix
         Matrix4x4 worldToCameraMatrix = cam.worldToCameraMatrix;
-
+        
         // Step 2: Convert world position to camera space
         Vector3 cameraSpacePosition = worldToCameraMatrix.MultiplyPoint(worldPosition);
 
         // Step 3: Get the camera's projection matrix
         Matrix4x4 projectionMatrix = cam.projectionMatrix;
-
+      
         // Step 4: Project the camera space position to NDC
         Vector4 clipSpacePosition = projectionMatrix * new Vector4(cameraSpacePosition.x, cameraSpacePosition.y, cameraSpacePosition.z, 1.0f);
-     //   Debug.Log($"{clipSpacePosition}");
-     //   Debug.Log($"{projectionMatrix.MultiplyPoint(new Vector3(cameraSpacePosition.x, cameraSpacePosition.y, cameraSpacePosition.z))}");
-           Debug.Log($"{projectionMatrix}");
-        Debug.Log($"{worldToCameraMatrix}");
+        //   Debug.Log($"{clipSpacePosition}");
+        //   Debug.Log($"{projectionMatrix.MultiplyPoint(new Vector3(cameraSpacePosition.x, cameraSpacePosition.y, cameraSpacePosition.z))}");
+        
         // Debug.Log($"" +
         //      $"{projectionMatrix.m00} {projectionMatrix.m01} {projectionMatrix.m02} {projectionMatrix.m03}\n" +
         //       $"{projectionMatrix.m10} {projectionMatrix.m11} {projectionMatrix.m12} {projectionMatrix.m13}\n" +
@@ -91,7 +92,12 @@ public class ManualFOVCheck : MonoBehaviour
         //Debug.Log($"Test 2 {worldToCameraMatrix}");
         // Step 5: Perform perspective divide to get NDC (Normalized Device Coordinates)
         Vector3 ndcPosition = new Vector3(clipSpacePosition.x / clipSpacePosition.w, clipSpacePosition.y / clipSpacePosition.w, clipSpacePosition.z / clipSpacePosition.w);
-
+        Debug.Log(worldPosition);
+        Debug.Log(worldToCameraMatrix);
+        Debug.Log(projectionMatrix);
+        Debug.Log(cameraSpacePosition);
+        Debug.Log(clipSpacePosition);
+        Debug.Log(ndcPosition);
         // Step 6: Convert NDC to viewport coordinates
         // NDC ranges from -1 to 1 in X and Y, so we convert it to 0 to 1
         Vector3 viewportPosition = new Vector3(

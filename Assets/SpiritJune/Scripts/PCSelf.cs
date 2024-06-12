@@ -79,6 +79,8 @@ public class PCSelf : MonoBehaviour
         {
             Matrix4x4 worldToCameraMatrix = cam.worldToCameraMatrix;
             Matrix4x4 projectionMatrix = cam.projectionMatrix;
+            Debug.Log(worldToCameraMatrix);
+            Debug.Log(projectionMatrix);
             string output = "";
             for (int i = 0; i < 4; i++)
             {
@@ -97,7 +99,7 @@ public class PCSelf : MonoBehaviour
                 }
             }
             Vector3 pos = transform.position;
-            output += $"{pos.x};{pos.y};{pos.z}";
+            output += $"{pos.x};{pos.y+1};{pos.z}";
             byte[] outputBytes = Encoding.ASCII.GetBytes(output);
             unsafe
             {
