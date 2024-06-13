@@ -50,7 +50,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ClientID: 0
   NDescriptions: 0
-  PCRenderer: {fileID: 1723125910333290623}
+  PCRenderers:
+  - {fileID: 1723125910333290623}
+  - {fileID: 4144847491285195835}
+  - {fileID: 7041236591155267482}
+  - {fileID: 3901860285570360832}
 --- !u!1 &1723125910333290623
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,12 +16,17 @@ using Debug = UnityEngine.Debug;
 
 public class CapturingTestMulti : MonoBehaviour
 {
+    public List<GameObject> renderers = new List<GameObject>();
+    private List<MeshFilter> filters = new List<MeshFilter>();
+    public GameObject VRCam;
+    public GameObject Table;
+    public int ClientID = 0;
     System.Threading.Thread myThread;
     static Dictionary<UInt32, DecodedPointCloudData> inProgessFrames;
     static ConcurrentQueue<DecodedPointCloudData> queue;
     private static Mutex mut = new Mutex();
     Mesh currentMesh;
-    private MeshFilter meshFilter;
+    //private MeshFilter meshFilter;
     public int debug = 0;
 
     static bool keep_working = true;
@@ -83,8 +88,8 @@ public class CapturingTestMulti : MonoBehaviour
             float* pointsUnsafePtr = (float*)pointsPtr;
             byte* colorsUnsafePtr = (byte*)colorPtr;
             int zeros = 0;
-            if(dscNr == 2)
-            {
+           // if(dscNr == 2)
+           // {
                 for (int i = 0; i < nDecodedPoints; i++)
                 {
                     //    points[i] = new Vector3(0, 0, 0);
@@ -95,7 +100,7 @@ public class CapturingTestMulti : MonoBehaviour
                     pcData.Points.Add(new Vector3(pointsUnsafePtr[(i * 3)] * -1, pointsUnsafePtr[(i * 3) + 1] * -1, pointsUnsafePtr[(i * 3) + 2] * -1));
                     pcData.Colors.Add(new Color32(colorsUnsafePtr[(i * 3)], colorsUnsafePtr[(i * 3) + 1], colorsUnsafePtr[(i * 3) + 2], 255));
                 }
-            }
+            //}
             
             Debug.Log($"ZEROES {dscNr} {zeros}");
             DracoInvoker.free_decoder(decoderPtr);
@@ -126,20 +131,36 @@ public class CapturingTestMulti : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 120;
+        var sessionInfo = SessionInfo.CreateFromJSON(Application.dataPath + "/config/session_config.json");
+        ClientID = sessionInfo.clientID;
         queue = new ConcurrentQueue<DecodedPointCloudData>();
         inProgessFrames = new();
-        meshFilter = GetComponent<MeshFilter>();
+        //meshFilter = GetComponent<MeshFilter>();
         Realsense2Invoker.RegisterDebugCallback(OnDebugCallback);
         Realsense2Invoker.set_logging("", debug);
         DracoInvoker.RegisterDebugCallback(OnDebugCallbackDraco);
         DracoInvoker.set_logging("", debug);
-        int initCode = Realsense2Invoker.initialize(848, 480, 30, 0.1f, 1.0f, false);
+        int initCode = Realsense2Invoker.initialize(sessionInfo.camWidth, sessionInfo.camHeight, sessionInfo.camFPS, sessionInfo.camClose, sessionInfo.camFar, !sessionInfo.useCam);
         DracoInvoker.register_description_done_callback(OnDescriptionDoneCallback);
         DracoInvoker.register_free_pc_callback(OnFreePCCallback);
         DracoInvoker.initialize();
         Debug.Log(initCode);
         if(initCode == 0)
         {
+            for(int i = 0; i < renderers.Count; i++)
+            {
+                filters.Add(renderers[i].GetComponent<MeshFilter>());
+                int offset = i == ClientID ? 1 : 0;
+                renderers[i].transform.position = new Vector3(sessionInfo.startPositions[i].x, sessionInfo.startPositions[i].y-offset, sessionInfo.startPositions[i].z);
+                if (i == ClientID)
+                {
+                    var pcSelf = Instantiate(VRCam, renderers[i].transform.position, renderers[i].transform.rotation);
+                    pcSelf.transform.parent = renderers[i].transform;
+                }
+                
+            }
+            Table.transform.position = new Vector3(sessionInfo.table.position.x, sessionInfo.table.position.y, sessionInfo.table.position.z);
+            Table.transform.localScale = new Vector3(sessionInfo.table.scale.x, sessionInfo.table.scale.y, sessionInfo.table.scale.z);
             myThread = new System.Threading.Thread(pollFrames);
             myThread.Start();
         } else
@@ -172,7 +193,15 @@ public class CapturingTestMulti : MonoBehaviour
                 Debug.Log($"NVertex: {currentMesh.vertexCount}");
                 Debug.Log($"Bounds: {currentMesh.bounds}");
                 currentMesh.UploadMeshData(true);
-                meshFilter.mesh = currentMesh;
+                for(int i = 0; i < filters.Count; i++)
+                {
+                    if(i != ClientID)
+                    {
+                        filters[i].mesh = currentMesh;
+                    }
+                }
+              
+                
 
             }
         }

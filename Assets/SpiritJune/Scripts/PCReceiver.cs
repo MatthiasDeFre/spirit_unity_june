@@ -248,7 +248,17 @@ public class PCReceiver : MonoBehaviour
     {
         switch(quality)
         {
-
+            case 100:
+            case 85:
+            case 75:
+            case 60:
+                return 0;
+            case 40:
+                return 1;
+            case 25:
+                return 2;
+            case 15:
+                return 3;
         }
         return -1;
     }

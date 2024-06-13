@@ -29,9 +29,12 @@ public class SessionManager : MonoBehaviour
     private List<PCReceiver> pcReceivers = new();
     // Start is called before the first frame update
 
+    private SessionInfo sessionInfo;
 
     void Start()
     {
+        sessionInfo = SessionInfo.CreateFromJSON(Application.dataPath + "/config/session_config.json");
+        ClientID = sessionInfo.clientID;
         // Init DLLs for logging
         DLLWrapper.LoggingInit(LoggingLevel);
         // TODO Start peer
@@ -83,12 +86,20 @@ public class SessionManager : MonoBehaviour
         {
             if(ClientID == i) // This user
             {
-                StartLocations[i].transform.position = new Vector3(StartLocations[i].transform.position.x, StartLocations[i].transform.position.y - 1, StartLocations[i].transform.position.z);
+                //StartLocations[i].transform.position = new Vector3(StartLocations[i].transform.position.x, StartLocations[i].transform.position.y - 1, StartLocations[i].transform.position.z);
+                StartLocations[i].transform.position = new Vector3(sessionInfo.startPositions[i].x, sessionInfo.startPositions[i].y - 1, sessionInfo.startPositions[i].z);
                 pcSelf = Instantiate(PCSelfPrefab, StartLocations[i].transform.position, StartLocations[i].transform.rotation);
                 pcSelf.transform.parent = StartLocations[i].transform;
+                pcSelf.UseCam = sessionInfo.useCam;
+                pcSelf.CamClose = sessionInfo.camClose;
+                pcSelf.CamFar = sessionInfo.camFar;
+                pcSelf.CamFPS = sessionInfo.camFPS;
+                pcSelf.CamWidth = sessionInfo.camWidth;
+                pcSelf.CamHeight = sessionInfo.camHeight;
                 
             } else // Other users
             {
+                StartLocations[i].transform.position = new Vector3(sessionInfo.startPositions[i].x, sessionInfo.startPositions[i].y, sessionInfo.startPositions[i].z);
                 PCReceiver pcReceiver = Instantiate(PCReceiverPrefab, StartLocations[i].transform.position, StartLocations[i].transform.rotation);
                 pcReceiver.transform.parent = StartLocations[i].transform;
                 pcReceiver.ClientID = (uint)i;

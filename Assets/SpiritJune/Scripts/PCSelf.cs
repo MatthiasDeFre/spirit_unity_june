@@ -10,6 +10,13 @@ using UnityEngine;
 
 public class PCSelf : MonoBehaviour
 {
+    public float CamClose;
+    public float CamFar;
+    public uint CamWidth;
+    public uint CamHeight;
+    public uint CamFPS;
+    public bool UseCam;
+
     public Camera cam;
     public float CameraUpdateTimer = 0.300f;
     private float currentCameraUpdateTimer = 0;
@@ -59,7 +66,7 @@ public class PCSelf : MonoBehaviour
         DracoInvoker.register_description_done_callback(OnDescriptionDoneCallback);
         DracoInvoker.register_free_pc_callback(OnFreePCCallback);
         DracoInvoker.initialize();
-        int initCode = Realsense2Invoker.initialize(848, 480, 30, 0.0f, 1.0f, false);
+        int initCode = Realsense2Invoker.initialize(CamWidth, CamHeight, CamFPS, CamClose, CamFar, UseCam);
         if (initCode == 0)
         {
             workerThread = new System.Threading.Thread(pollFrames);
