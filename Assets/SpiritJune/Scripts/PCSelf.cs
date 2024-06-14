@@ -37,7 +37,11 @@ public class PCSelf : MonoBehaviour
             System.Buffer.BlockCopy(frameHeader, 0, messageBuffer, 0, frameHeader.Length);
             Marshal.Copy(rawDataPtr, messageBuffer, frameHeader.Length, (int)dscSize);
             int nSend = 0;
-          //  Debug.Log($"{dscNr} {dscSize}");
+            if(frameNr % 10 ==0)
+            {
+                Debug.Log($"{frameNr} {dscNr} {dscSize}");
+            }
+           
             unsafe
             {
                 fixed (byte* bufferPointer = messageBuffer)

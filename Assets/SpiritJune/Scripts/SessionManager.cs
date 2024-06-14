@@ -15,7 +15,7 @@ public class SessionManager : MonoBehaviour
     public int ClientID = 0;
     public int NDescriptions = 3;
     public int PeerUDPPort = 8000;
-    public string PeerSFUAddress = "10.10.130.215:8094";
+    public string PeerSFUAddress = "192.168.10.2:8094";
 
     private Process peerProcess;
 

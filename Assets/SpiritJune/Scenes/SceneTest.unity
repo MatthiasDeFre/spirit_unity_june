@@ -338,7 +338,7 @@ MonoBehaviour:
   ClientID: 0
   NDescriptions: 3
   PeerUDPPort: 8000
-  PeerSFUAddress: 10.10.130.215:8094
+  PeerSFUAddress: 192.168.10.2:8094
   StartLocations:
   - {fileID: 428462893}
   - {fileID: 1595278737}
