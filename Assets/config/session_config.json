@@ -1,5 +1,5 @@
 {
-    "clientID": 2,
+    "clientID": 0,
     "startPositions": [
         {"x": 19.7, "y":1, "z": -0.35},
         {"x": 19.0, "y":1, "z": -1.1},
@@ -14,6 +14,6 @@
     "camFar": 1.0,
     "camWidth": 848,
     "camHeight": 480,
-    "camFPS": 30,
-    "useCam": false
+    "camFPS": 15,
+    "useCam": true
 }
