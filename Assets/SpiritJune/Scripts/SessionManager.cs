@@ -23,6 +23,7 @@ public class SessionManager : MonoBehaviour
     public List<GameObject> StartLocations;
     public PCSelf PCSelfPrefab;
     public PCReceiver PCReceiverPrefab;
+    public GameObject Table;
 
     // ################# Private Variables ###############
     private PCSelf pcSelf;
@@ -35,6 +36,8 @@ public class SessionManager : MonoBehaviour
     {
         sessionInfo = SessionInfo.CreateFromJSON(Application.dataPath + "/config/session_config.json");
         ClientID = sessionInfo.clientID;
+        Table.transform.position = new Vector3(sessionInfo.table.position.x, sessionInfo.table.position.y, sessionInfo.table.position.z);
+        Table.transform.localScale = new Vector3(sessionInfo.table.scale.x, sessionInfo.table.scale.y, sessionInfo.table.scale.z);
         // Init DLLs for logging
         DLLWrapper.LoggingInit(LoggingLevel);
         // TODO Start peer
