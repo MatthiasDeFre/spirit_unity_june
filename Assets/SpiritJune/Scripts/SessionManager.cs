@@ -42,13 +42,13 @@ public class SessionManager : MonoBehaviour
         
         peerProcess = new Process();
         peerProcess.StartInfo.FileName = Application.dataPath + "/peer/webRTC-peer-win.exe";
-        peerProcess.StartInfo.Arguments = $"-p :{PeerUDPPort} -i -o -sfu {PeerSFUAddress} -c {ClientID} -t {NDescriptions}";
-        /*peerProcess.StartInfo.CreateNoWindow = !peerInWindow;
-        if (peerInWindow && peerWindowDontClose)
-        {
+        peerProcess.StartInfo.Arguments = $"-p :{sessionInfo.peerUDPPort} -i -o -sfu {sessionInfo.sfuAddress} -c {ClientID} -t {NDescriptions}";
+        peerProcess.StartInfo.CreateNoWindow = false;
+      //  if (peerInWindow && peerWindowDontClose)
+     //   {
             peerProcess.StartInfo.Arguments = $"/K {peerProcess.StartInfo.FileName} {peerProcess.StartInfo.Arguments}";
             peerProcess.StartInfo.FileName = "CMD.EXE";
-        }*/
+      //  }*/
 
         PCHelperWrapper.Init();
         // Init WebRTC

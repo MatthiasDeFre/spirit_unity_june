@@ -132,6 +132,7 @@ public class CapturingTestMulti : MonoBehaviour
     {
         Application.targetFrameRate = 120;
         var sessionInfo = SessionInfo.CreateFromJSON(Application.dataPath + "/config/session_config.json");
+        Debug.Log(sessionInfo.sfuAddress + " " + sessionInfo.peerUDPPort);
         ClientID = sessionInfo.clientID;
         queue = new ConcurrentQueue<DecodedPointCloudData>();
         inProgessFrames = new();

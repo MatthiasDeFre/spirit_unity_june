@@ -8,6 +8,8 @@ public class SessionInfo
     public int clientID;
     public StartPosition[] startPositions;
     public Table table;
+    public string sfuAddress;
+    public int peerUDPPort;
     public float camClose;
     public float camFar;
     public uint camWidth;
