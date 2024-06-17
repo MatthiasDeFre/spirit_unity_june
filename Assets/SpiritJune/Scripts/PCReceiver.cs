@@ -15,7 +15,7 @@ public class PCReceiver : MonoBehaviour
 {
     public uint ClientID;
     public int NDescriptions;
-    private List<bool> activeDescriptions;
+    private List<bool> activeDescriptions = new List<bool> { false, false, false };
     private List<System.Threading.Thread> workerThreads = new List<System.Threading.Thread>();
   //  private List<ConcurrentQueue<DecodedPointCloudData>> queues = new List<ConcurrentQueue<DecodedPointCloudData>>();
 
@@ -41,7 +41,7 @@ public class PCReceiver : MonoBehaviour
         }
         queue = new();
         inProgessFrames = new();
-        activeDescriptions = new(NDescriptions);
+       // activeDescriptions = new(NDescriptions);
         for(int i = 0; i < NDescriptions; i++)
         {
             activeDescriptions.Add(false);
@@ -182,7 +182,11 @@ public class PCReceiver : MonoBehaviour
                     pcData.Quality += descToQual(descriptionID);
                     if (pcData.IsCompleted)
                     {
-                        //Debug.Log($"Frame {descriptionFrameNr} completed, last compl= {lastCompletedFrameNr}");
+                        if(descriptionFrameNr % 10 == 0)
+                        {
+                            Debug.Log($"Frame {descriptionFrameNr} completed, last compl= {lastCompletedFrameNr}");
+                        }
+                       
                         inProgessFrames.Remove(descriptionFrameNr);
                         if (descriptionFrameNr >= lastCompletedFrameNr)
                         {

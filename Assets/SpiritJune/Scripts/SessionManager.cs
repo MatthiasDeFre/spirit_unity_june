@@ -74,9 +74,8 @@ public class SessionManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        peerProcess?.Kill();
         WebRTCInvoker.clean_up();
-        
+        peerProcess?.Kill();
     }
 
     // ############################# Private Functions #######################################

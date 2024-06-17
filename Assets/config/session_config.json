@@ -1,6 +1,6 @@
 {
     "clientID": 0,
-    "sfuAddress": "192.168.100.191:8094",
+    "sfuAddress": "192.168.10.2:8094",
     "peerUDPPort": 8000,
     "startPositions": [
         {"x": 19.7, "y":1, "z": -0.35},
@@ -16,6 +16,6 @@
     "camFar": 1.0,
     "camWidth": 848,
     "camHeight": 480,
-    "camFPS": 15,
-    "useCam": false
+    "camFPS": 30,
+    "useCam": true
 }

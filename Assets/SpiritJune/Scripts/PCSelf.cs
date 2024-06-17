@@ -147,6 +147,10 @@ public class PCSelf : MonoBehaviour
                 uint nPoints = Realsense2Invoker.get_point_cloud_size(frame);
                 Debug.Log($"Number of points: {nPoints}");
                 int returnCode = DracoInvoker.encode_pc(frame);
+                if(returnCode == 0 )
+                {
+                    Debug.Log("Enqueue frame");
+                }
             } else
             {
                 Debug.Log("No frame"); 
