@@ -63,8 +63,13 @@ public class PCReceiver : MonoBehaviour
     {
         if (!queue.IsEmpty)
         {
-            DecodedPointCloudData dec;
-            bool succes = queue.TryDequeue(out dec);
+            DecodedPointCloudData dec = null;
+            bool succes = false;
+            while(!queue.IsEmpty)
+            {
+                succes = queue.TryDequeue(out dec);
+            }
+            
             if (succes)
             {
                 Debug.Log("Dequeue Successful!");
