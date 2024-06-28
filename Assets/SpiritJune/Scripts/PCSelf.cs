@@ -18,6 +18,7 @@ public class PCSelf : MonoBehaviour
     public bool UseCam;
 
     public Camera cam;
+    public GameObject camOffset;
     public float CameraUpdateTimer = 0.300f;
     private float currentCameraUpdateTimer = 0;
 
@@ -86,6 +87,10 @@ public class PCSelf : MonoBehaviour
     void Update()
     {
         currentCameraUpdateTimer += Time.deltaTime;
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+
+        camOffset.transform.eulerAngles = new Vector3(camOffset.transform.rotation.eulerAngles.x + (100 * verticalInput * Time.deltaTime), camOffset.transform.rotation.eulerAngles.y+ (100* horizontalInput  * Time.deltaTime), 0);
         if(currentCameraUpdateTimer > CameraUpdateTimer)
         {
             Matrix4x4 worldToCameraMatrix = cam.worldToCameraMatrix;
